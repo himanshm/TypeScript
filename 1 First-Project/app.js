@@ -1,23 +1,36 @@
-console.log('Your code goes here...');
-// TypeScript's type syetem only helps you during development (i.e. before the code gets compiled.)
-// The key difference is: JavaScript uses 'dynamic types' (resolved at runtime), TypeScript uses 'static types' (set during development).
-// Important: Type Casing
-// In TypeScript, you work with types like `string` or `number` all the times.
-// Important: It is `string` and `number` (etc.), NOT `String`, `Number` etc.
-// The core primitive types in TypeScript are all lowercase!
-// In JavaScript and the same is true in TypeScript, all numbers are floats by default.
-// Core Types: number, string, boolean
-function add(n1, n2, showResult, phrase) {
-    var result = n1 + n2;
-    if (showResult) {
-        console.log(phrase + result);
-    }
-    else {
-        return result;
-    }
+// Object types are written almost like objects, but we don't have key:value pairs in there, but key:type pairs separated by semi-colon
+var person = {
+    name: 'Himanshu',
+    age: 29,
+};
+//  Nested Objects & Types
+// Of course object types can also be created for nested objects.
+var product = {
+    id: 'abc1',
+    price: 12.99,
+    tags: ['great-offer', 'hot-and-new'],
+    details: {
+        title: 'Red Carpet',
+        description: 'A great carpet - almost brand-new!',
+    },
+};
+// but above definition is suboptimal, of course TypeScript doesn't complain as it infers it to the type it wants and we can have a look if we hover over product but the optimal way of doing it would be
+var optimalProduct = {
+    id: 'abc1',
+    price: 12.99,
+    tags: ['great-offer', 'hot-and-new'],
+    details: {
+        title: 'Red Carpet',
+        description: 'A great carpet - almost brand-new!',
+    },
+};
+// Tuples - TypeScript type -- Fixed length array also fixed type
+var myPerson = {
+    name: 'Himanshu',
+    age: 29,
+    hobbies: ['Sports', 'Coding'],
+};
+for (var _i = 0, _a = myPerson.hobbies; _i < _a.length; _i++) {
+    var hobby = _a[_i];
+    console.log(hobby.toUpperCase());
 }
-var number1 = 5;
-var number2 = 5.6;
-var printResult = true;
-var resultPhrase = 'Result is: ';
-add(number1, number2, printResult, resultPhrase);
