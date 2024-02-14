@@ -20,13 +20,15 @@ user1 = {
 
 // Interface can be be used as a contract a class can implement and a class then has to adhere to.
 
-
-
-interface Greetable {
+interface Named {
   readonly name: string;
+}
+// A class can have multiple interfaces, and we can also extend multiple interfaces
+
+// Inheritance
+interface Greetable extends Named {
   greet(pharse: string): void;
 }
-// A class can have multiple interfaces
 
 class Person implements Greetable {
   name: string;
