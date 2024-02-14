@@ -3,7 +3,9 @@
 class Department {
   //   private id: string;
   //   private name: string;
-  private employees: string[] = [];
+  protected employees: string[] = [];
+
+  // Private properties are really only accessible from inside the class in which they're defined, not classes that inherit from that class. So, employees is available inside of the department, but not in classes based on department. So, accounting department doesn't have direct access to the employees properties. If we want to grant that access, and still make sure that it's not a property that can be changed from outside, we can switch it to protected. Protected is like private, but unlike private, it's now not just available in this class, but also in any class that extends this class.
 
   constructor(private readonly id: string, public name: string) {
     // this.name = n;
@@ -37,6 +39,13 @@ class AccountingDepartment extends Department {
   constructor(id: string, private reports: string[]) {
     super(id, 'Accounting'); //  calls the constructor of the base class
   }
+  // override methods of the base class
+  addEmployee(name: string): void {
+    if (name === 'Himanshu') {
+      return;
+    }
+    this.employees.push(name);
+  }
 
   addReport(text: string) {
     this.reports.push(text);
@@ -57,3 +66,14 @@ console.log(it);
 it.describe();
 it.printEmplyeeInfo();
 // RULE OF THUMB: this refers to the thing which is responsible for calling the method
+
+const accounting = new AccountingDepartment('d2', []);
+
+accounting.addReport('Something went wrong...');
+
+accounting.addEmployee('Himanshu');
+accounting.addEmployee('Max');
+
+accounting.printReports();
+
+accounting.printEmplyeeInfo();
