@@ -36,8 +36,28 @@ class ITDepartment extends Department {
 }
 
 class AccountingDepartment extends Department {
+  private lastReport: string;
+
+  // A getter is a property where we execute a function or method, when we retrieve a value and that allows us as developers to add more complex logic. Helps us controlling the access of a property
+
+  get mostRecentReport() {
+    // a getter method has to return something
+    if (this.lastReport) {
+      return this.lastReport;
+    }
+    throw new Error('No report found!');
+  }
+
+  set mostRecentReport(value: string) {
+    if (!value) {
+      throw new Error('Pass in a valid value');
+    }
+    this.addReport(value);
+  }
+
   constructor(id: string, private reports: string[]) {
     super(id, 'Accounting'); //  calls the constructor of the base class
+    this.lastReport = reports[0];
   }
   // override methods of the base class
   addEmployee(name: string): void {
@@ -49,6 +69,7 @@ class AccountingDepartment extends Department {
 
   addReport(text: string) {
     this.reports.push(text);
+    this.lastReport = text;
   }
 
   printReports() {
@@ -69,7 +90,16 @@ it.printEmplyeeInfo();
 
 const accounting = new AccountingDepartment('d2', []);
 
+// Getter and setter are accessed as a property and not executed as a method
+// console.log(accounting.mostRecentReport);
+
+// accounting.mostRecentReport = ''
+
+accounting.mostRecentReport = 'Year End Report';
+
 accounting.addReport('Something went wrong...');
+
+console.log(accounting.mostRecentReport);
 
 accounting.addEmployee('Himanshu');
 accounting.addEmployee('Max');
