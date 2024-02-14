@@ -1,16 +1,14 @@
 // Define a class -> object blueprints
 
 class Department {
-  //   private id: string;
-  //   private name: string;
+  static fiscalYear = 2020;
   protected employees: string[] = [];
 
-  // Private properties are really only accessible from inside the class in which they're defined, not classes that inherit from that class. So, employees is available inside of the department, but not in classes based on department. So, accounting department doesn't have direct access to the employees properties. If we want to grant that access, and still make sure that it's not a property that can be changed from outside, we can switch it to protected. Protected is like private, but unlike private, it's now not just available in this class, but also in any class that extends this class.
+  constructor(private readonly id: string, public name: string) {}
 
-  constructor(private readonly id: string, public name: string) {
-    // this.name = n;
+  static createEmployee(name: string) {
+    return { name: name };
   }
-
   describe(this: Department) {
     console.log(`Department (${this.id}): ${this.name}`);
   }
@@ -25,8 +23,6 @@ class Department {
   }
 }
 
-// Inheritance => the class which inherits automatically gets everything the base class, Department in this case, has
-// As long as we don't add a dedicated constructor for this inherited class, for this subclass, the base class' constructor is automatically used when we instantiate our subclass
 class ITDepartment extends Department {
   admins: string[];
   constructor(id: string, admins: string[]) {
@@ -77,6 +73,9 @@ class AccountingDepartment extends Department {
   }
 }
 
+const employee1 = Department.createEmployee('Max');
+console.log(employee1);
+
 const it = new ITDepartment('d1', ['Himanshu']);
 
 it.addEmployee('Max');
@@ -107,3 +106,8 @@ accounting.addEmployee('Max');
 accounting.printReports();
 
 accounting.printEmplyeeInfo();
+
+// Static methods and properties
+//Static properties and methods allow you to add properties and methods to classes which are not accessed on an instance of the class, so where you don't need to call new class name first, but which you access directly on the class. This is often used for utility functions that you want to group or map to a class logically, or global constants which you also wanna store in a class.
+
+// An example built into JavaScript, which is not defined by typescript and not defined by you, but part of JavaScript in the browser is the Math constructor function, or class if you wanna call it like this, that's globally available in JavaScript, where you can access pi as a constant value to give you that pi number, or functions, or methods to be precise, like pow to calculate the power of something. These are methods and properties which you don't access on the instance of Math. You don't have to call new math first. Indeed that won't work, but you access these properties in methods directly on the class itself. So Math acts more like a name space as a grouping mechanism here and that's a common use case for static methods and properties
