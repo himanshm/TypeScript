@@ -23,7 +23,7 @@ user1 = {
 interface Named {
   readonly name: string;
 }
-// A class can have multiple interfaces, and we can also extend multiple interfaces
+// A class can have multiple interfaces, and we can also extend multiple
 
 // Inheritance
 interface Greetable extends Named {
@@ -53,3 +53,23 @@ console.log(user2);
 
 // If we want to work on an object, we want to use interfaces
 // readonly is the only identifier we can use with interface
+
+// Function types with interface=> alternative to custom function type
+
+interface AddFn {
+  (a: number, b: number): number;
+}
+
+let add: AddFn;
+
+add = (n1: number, n2: number) => {
+  return n1 + n2;
+};
+
+// optional Parameters and properties
+
+interface Named {
+  readonly name: string;
+  outputName?: string;  // Optional
+}
+// You can add optional parameters either by providing a default fall back value or by adding a question mark in which case the default value will be undefined.
