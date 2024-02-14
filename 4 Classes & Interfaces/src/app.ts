@@ -11,7 +11,9 @@ class Department {
   // Functions in objects are simply called methods
   // Constructor is essentially a function tied to this class and tied to any object we create based on the class which is executed when the object is being created. This allows us to do some initiallisation work for the object being built.
 
-  constructor(private id: string, public name: string) {
+  // If we have certain fields that shouldn't not just be private or public but they shouldn't change after their initialisation => readonly This also doesn't exist in javascript and is introduced by TypeScript
+
+  constructor(private readonly id: string, public name: string) {
     // this.name = n;
   }
 
