@@ -141,3 +141,17 @@ const userInput = document.getElementById('user-input')!;
 if (userInput) {
   (userInput as HTMLInputElement).value = 'Hi there';
 }
+
+// Index properties
+interface ErrorContainer {
+  id: string;
+  [prop: string]: string;
+
+  // So with that I'm saying I don't know the exact property name. I also don't know the property count. I just know that every property which is added to this object, which is based on error container, must have a property name which can be interpreted as a string and the value of the property also must be a string.
+}
+
+const errorBag: ErrorContainer = {
+  id: `e1`,
+  email: `Not a valid email`,
+  userName: `Must start with a capital character`,
+};
