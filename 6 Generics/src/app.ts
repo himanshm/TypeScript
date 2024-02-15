@@ -1,69 +1,45 @@
-// Built in generics
+// Generic Classes
 
-const names: Array<string> = [];
+class DataStorage<T extends string | number | boolean> {
+  private data: T[] = [];
 
-const promise: Promise<string> = new Promise((resolve, reject) => {});
-
-// Generic Functions
-
-function merger<T, U>(objA: T, objB: U) {
-  return Object.assign({}, objA, objB);
-}
-
-// This comes from the fact that Object.assign accepts an object as a first argument, but then can accept an arbitrary number of any arguments.
-
-// The fact that we get the error for the first argument only, is a consequence of the Object.assign definition in native JS:
-
-function merge<T, U>(objA: T, objB: U) {
-  return { ...objA, ...objB };
-}
-
-const mergeObj = merge({ name: 'Him', hobbies: ['Sports'] }, { age: 30 });
-
-console.log(mergeObj);
-console.log(mergeObj.name);
-
-const mergeOb = merger({ name: 'Him', hobbies: ['Sports'] }, { age: 30 });
-
-console.log(mergeOb);
-console.log(mergeOb.name);
-
-// Constraints (extends)
-
-function mergeObjs<T extends object, U extends object>(objA: T, objB: U) {
-  return Object.assign({}, objA, objB);
-}
-
-const newMergedObjs = mergeObjs({ name: 'Him' }, { age: 30 });
-
-interface Lengthy {
-  length: number;
-}
-
-function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
-  let descriptionText = `Got no value...`;
-
-  if (element.length === 1) {
-    descriptionText = `Got 1 element.`;
-  } else if (element.length > 1) {
-    descriptionText = `Got ${element.length} elements.`;
+  addItem(item: T) {
+    this.data.push(item);
   }
-  return [element, descriptionText];
+
+  removeItem(item: T) {
+    this.data.splice(this.data.indexOf(item), 1);
+  }
+
+  getItems() {
+    return [...this.data];
+  }
 }
 
-console.log(countAndDescribe(`Hi there...`));
+const textStorage = new DataStorage<string>();
 
-// 'keyof'constraint
+textStorage.addItem('Him');
+textStorage.addItem('Manu');
+textStorage.addItem('Max');
 
-// function extractAndConvert(obj: object, key: string) {
-//   return obj[key];  // We can not guarantee that obj has an element key in it
-// }
+console.log(textStorage.getItems());
 
-function extractAndConvert<T extends object, U extends keyof T>(
-  obj: T,
-  key: U
-) {
-  return obj[key];
-}
+textStorage.removeItem('Max');
 
-extractAndConvert({ name: 'Max' }, `name`);
+console.log(textStorage.getItems());
+
+const numberStorage = new DataStorage<number>();
+
+// const objStorage = new DataStorage<object>();
+
+// objStorage.addItem({ name: 'Him' });
+// objStorage.addItem({ name: 'Vim' });
+// objStorage.addItem({ name: 'Tim' });
+
+// objStorage.removeItem({ name: 'Tim' });
+
+// console.log(objStorage.getItems());
+
+// objStorage.removeItem({ name: 'Vim' });
+
+// console.log(objStorage.getItems());
