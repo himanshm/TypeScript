@@ -73,3 +73,6 @@ const names: Readonly<string[]> = ['Max', 'Anna']; // Now this array cannot be c
 // Union types can be great if you want to have a function which you can call with one of these types every time you call it.
 
 // Generic types are great if you want to lock in a certain type. Use the same type throughout the entire class instance you create. Use the same type throughout the entire functio
+
+
+// Generics help you create data structures that work together or wrap values of a broad variety of types (e.g. an array that can hold any type of data).
