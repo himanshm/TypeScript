@@ -155,3 +155,19 @@ const errorBag: ErrorContainer = {
   email: `Not a valid email`,
   userName: `Must start with a capital character`,
 };
+
+// Function Overloads: a feature that allows us to define multiple function signatures, so to say, for one and the same function. Which simply means we can have multiple possible ways of calling a function with different parameters,
+
+function sum(a: string, b: string): string;
+function sum(a: number, b: number): number;
+function sum(a: Combinable, b: Combinable) {
+  // A type guard using type of
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+
+const result = sum(`Max`, ` Schwarz`);
+
+result.split('');
