@@ -88,3 +88,33 @@ function useVehicle(vehicle: Vehicle) {
 
 useVehicle(v1);
 useVehicle(v2);
+
+// Discriminated Union: It's a pattern, which you can use when working with union types, that makes implementing type guards easier. It is available when you work with object types.
+
+interface Bird {
+  type: 'bird';
+  flyingSpeed: number;
+}
+
+interface Horse {
+  type: `horse`;
+  runningSpeed: number;
+}
+
+type Animal = Bird | Horse;
+// Now this is a discriminated union because we have one common property in every object that makes up our union, which describes that object, so that we can use this property that describes this object in our check to have 100% type safety and understand which properties are available for such an object and which properties are not.
+
+function moveAnimal(animal: Animal) {
+  let speed;
+  switch (animal.type) {
+    case 'bird':
+      speed = animal.flyingSpeed;
+      break;
+    case 'horse':
+      speed = animal.runningSpeed;
+  }
+
+  console.log(`Moving at speed: ${speed} kmph`);
+}
+
+moveAnimal({ type: `bird`, flyingSpeed: 10 });
