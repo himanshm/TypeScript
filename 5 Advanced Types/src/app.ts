@@ -1,4 +1,4 @@
-// Code goes here!
+// Intersection Types
 
 type Admin = {
   name: string;
@@ -22,3 +22,69 @@ type Combinable = string | number;
 type Numeric = number | boolean;
 
 type Universal = Combinable & Numeric;
+
+// Type Guards
+function add(a: Combinable, b: Combinable) {
+  // A type guard using type of
+  if (typeof a === 'string' || typeof b === 'string') {
+    return a.toString() + b.toString();
+  }
+  return a + b;
+}
+
+type UnknownEmployee = Employee | Admin;
+
+function printEmployeeInfo(emp: UnknownEmployee) {
+  console.log('Name: ' + emp.name);
+  if ('privileges' in emp) {
+    console.log('Privileges: ' + emp.privileges);
+  }
+
+  if ('startDate' in emp) {
+    console.log(`Privileges: ${emp.startDate}`);
+  }
+}
+
+printEmployeeInfo(e1);
+
+class Car {
+  drive() {
+    console.log(`Driving...`);
+  }
+}
+
+class Truck {
+  drive() {
+    console.log(`Driving A Truck...`);
+  }
+
+  loadCargo(amount: number) {
+    console.log(`Loading Cargo... ${amount} kg`);
+  }
+}
+
+type Vehicle = Car | Truck;
+
+const v1 = new Car();
+const v2 = new Truck();
+
+// function useVehicle(vehicle: Vehicle) {
+//   vehicle.drive();
+//   if (`loadCargo` in vehicle) {
+//     vehicle.loadCargo(1000);
+//   }
+// }
+
+function useVehicle(vehicle: Vehicle) {
+  vehicle.drive();
+  if (vehicle instanceof Truck) {
+    vehicle.loadCargo(1000);
+  }
+}
+
+// since classes are compiled to something JavaScript understands, constructor functions, it is able to use that.
+
+// If we would be using a interface here instead of a class, and, therefore, of course, we couldn't have the implementation in here, but we'll do that when we create a object with the object literal notation, then we could not use instanceof because interfaces, as you learned, are not compiled to any JavaScript code, and, therefore, we can't use them at runtime. For classes we can do that because JavaScript supports classes and constructor functions, and with instanceof, you can then find out if some object is based on that class.
+
+useVehicle(v1);
+useVehicle(v2);
