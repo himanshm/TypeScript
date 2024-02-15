@@ -118,3 +118,26 @@ function moveAnimal(animal: Animal) {
 }
 
 moveAnimal({ type: `bird`, flyingSpeed: 10 });
+
+// Type Casting:  helps you tell TypeScript that some value is of a specific type where TypeScript is not able to detect it on it's own, but you as a developer know that it will be the case.
+
+const paragraph = document.querySelector(`p`);
+// const userInputElement = <HTMLInputElement>(
+//   document.getElementById('user-input')
+// );
+
+const userInputElement = document.getElementById(
+  'user-input'
+)! as HTMLInputElement;
+
+userInputElement.value = 'Hi There!';
+
+// ! exclamation mark allows us to tell TypeScript that the expression in front of it will never yield null.
+
+// If we're not sure that an expression might return null or not
+
+const userInput = document.getElementById('user-input')!;
+
+if (userInput) {
+  (userInput as HTMLInputElement).value = 'Hi there';
+}
