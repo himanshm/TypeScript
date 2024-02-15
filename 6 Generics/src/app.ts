@@ -69,3 +69,7 @@ function createCourseGoal(
 }
 
 const names: Readonly<string[]> = ['Max', 'Anna']; // Now this array cannot be changed
+
+// Union types can be great if you want to have a function which you can call with one of these types every time you call it.
+
+// Generic types are great if you want to lock in a certain type. Use the same type throughout the entire class instance you create. Use the same type throughout the entire functio
