@@ -1,9 +1,13 @@
-function Logger(constructor: Function) {
-  console.log('Logging...');
-  console.log(constructor);
+function Logger(logString: string) {
+  return function (constructor: Function) {
+    console.log(logString);
+    console.log(constructor);
+  };
 }
 
-@Logger
+@Logger('LOGGING - PERSON')
+
+/*So the decorator runs when JavaScript finds your class definition, your constructor function definition. Not when you use that constructor function to instantiate an object. */
 class Person {
   name = 'Max';
 
