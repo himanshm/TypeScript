@@ -5,11 +5,19 @@ function Logger(logString: string) {
   };
 }
 
-/*A decorator factory is basically returns a decorator function, but allows us to configure it when we assign it as a decorator to something. */
+function WithTemplate(template: string, hookId: string) {
+  return function (constructor: any) {
+    const hookEl = document.getElementById(hookId);
+    const p = new constructor();
+    if (hookEl) {
+      hookEl.innerHTML = template;
+      hookEl.querySelector('h1')!.textContent = p.name;
+    }
+  };
+}
 
-@Logger('LOGGING - PERSON')
-
-/*So the decorator runs when JavaScript finds your class definition, your constructor function definition. Not when you use that constructor function to instantiate an object. */
+// @Logger('LOGGING - PERSON')
+@WithTemplate('<h1>My Person Object</h1>', 'app')
 class Person {
   name = 'Max';
 
