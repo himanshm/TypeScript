@@ -15,7 +15,7 @@ class Project {
 
 // Project State Management
 
-type Listener = (items: Project[]) => void
+type Listener = (items: Project[]) => void;
 class ProjectState {
   private projects: Project[] = [];
   private listeners: Listener[] = [];
@@ -47,7 +47,7 @@ class ProjectState {
       title,
       description,
       numOfPeople,
-      ProjectStatus.Active  // Every project by default is Active
+      ProjectStatus.Active // Every project by default is Active
     );
     this.projects.push(newProject);
     for (const listenerFn of this.listeners) {
@@ -143,8 +143,15 @@ class ProjectList {
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
 
+    /* The filter method is a default method which exists on any array in JavaScript. This takes a function which then executes on every item in that projects array and when this function here returns true, we keep the item in a newly created array which is then stored in relevant projects. If this function returns false, we drop the item, not from the original list, but in the new list which is generated and which is stored in relevant projects. */
     projectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects;
+      const relevantProjects = projects.filter((prj) => {
+        if (this.type === 'active') {
+          return prj.status === ProjectStatus.Active;
+        }
+        return prj.status === ProjectStatus.Finished;
+      });
+      this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
     this.attach();
@@ -155,6 +162,7 @@ class ProjectList {
     const listEl = <HTMLUListElement>(
       document.getElementById(`${this.type}-projects-list`)!
     );
+    listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement('li');
       listItem.textContent = prjItem.title;
