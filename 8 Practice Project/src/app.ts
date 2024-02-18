@@ -1,3 +1,46 @@
+// Project State Management
+class ProjectState {
+  private projects: any[] = [];
+  private listeners: any[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  addListener(listenerFn: Function) {
+    this.listeners.push(listenerFn);
+  }
+
+  generateGUID(): string {
+    const timestamp = new Date().getTime().toString(16);
+    const randomNum = Math.floor(Math.random() * 1000000).toString(16);
+    return `${timestamp}-${randomNum}`;
+  }
+
+  addProject(title: string, description: string, numOfPeople: number) {
+    const newProject = {
+      id: this.generateGUID(),
+      title,
+      description,
+      people: numOfPeople,
+    };
+    this.projects.push(newProject);
+    for (const listenerFn of this.listeners) {
+      listenerFn(this.projects.slice());
+    }
+  }
+}
+
+// Glabal instance of Project State
+const projectState = ProjectState.getInstance();
+
 // Validation
 interface Validatable {
   value: string | number;
@@ -66,12 +109,14 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   element: HTMLElement;
+  assignedProjects: any[];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = <HTMLTemplateElement>(
       document.getElementById('project-list')!
     );
     this.hostElement = <HTMLDivElement>document.getElementById('app')!;
+    this.assignedProjects = [];
 
     const importedNode = document.importNode(
       this.templateElement.content,
@@ -79,8 +124,24 @@ class ProjectList {
     );
     this.element = importedNode.firstElementChild as HTMLElement;
     this.element.id = `${this.type}-projects`;
+
+    projectState.addListener((projects: any[]) => {
+      this.assignedProjects = projects;
+      this.renderProjects();
+    });
     this.attach();
     this.renderContent();
+  }
+
+  private renderProjects() {
+    const listEl = <HTMLUListElement>(
+      document.getElementById(`${this.type}-projects-list`)!
+    );
+    for (const prjItem of this.assignedProjects) {
+      const listItem = document.createElement('li');
+      listItem.textContent = prjItem.title;
+      listEl.appendChild(listItem);
+    }
   }
 
   private renderContent() {
@@ -181,6 +242,7 @@ class ProjectInput {
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
       const [title, description, people] = userInput;
+      projectState.addProject(title, description, people);
     }
     this.clearInputs();
   }
@@ -188,8 +250,6 @@ class ProjectInput {
   private configure() {
     this.element.addEventListener('submit', this.submitHandler);
   }
-
-  /*The problem here is that, this here, that this keyword in submitHandler does not point at the class actually. Why? Well because of the way JavaScript and typescript works, we bind the method here to the event listener and when we bind something to an event or with the help of an event listener then that method, which is going to get executed, will have this bound to something else, in this case to the current target of the event. So this in this method will not point at the class, when the method is triggered upon an event with an event listener. Now the work around or the solution is to actually call bind here on submitHandler to preconfigure how this function is going execute when it executes in the future, and the first argument we can pass to bind then is actually what the this keyword will refer to inside of the to be executed function. */
 
   private attach() {
     this.hostElement.insertAdjacentElement('afterbegin', this.element);
