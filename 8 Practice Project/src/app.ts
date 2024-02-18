@@ -202,9 +202,12 @@ class ProjectItem
     this.renderContent();
   }
 
+  /*data transfer could actually be null So we have to add an exclamation mark here we of course know that it won't be null here You might wonder why could it be null Well the drag event is always the same kind of event but based on which listener triggers it or which exact event you're listening to, data transfer is not necessarily available So not all drag-related events give you an event object that has the data transfer object. The dragStartHandler which fires up on the dragstart event however, does have it so here we can safely call setData. */
+
   @autobind
   dragStartHandler(event: DragEvent): void {
-    console.log(event);
+    event.dataTransfer?.setData('text/plain', this.project.id);
+    event.dataTransfer!.effectAllowed = 'move';
   }
 
   @autobind
@@ -240,13 +243,18 @@ class ProjectList
   }
 
   @autobind
-  dragOverHandler(_: DragEvent): void {
-    const listEl = this.element.querySelector('ul')!;
-    listEl.classList.add('droppable');
+  dragOverHandler(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+      const listEl = this.element.querySelector('ul')!;
+      listEl.classList.add('droppable');
+    }
   }
 
   @autobind
-  dropHandler(_: DragEvent): void {}
+  dropHandler(event: DragEvent): void {
+    console.log(event.dataTransfer?.getData('text/plain'));
+  }
 
   @autobind
   dragLeaveHandler(_: DragEvent): void {
