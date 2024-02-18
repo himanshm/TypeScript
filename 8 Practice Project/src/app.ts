@@ -29,7 +29,7 @@ class ProjectState extends State<Project> {
   private static instance: ProjectState;
 
   private constructor() {
-    super()
+    super();
   }
 
   static getInstance() {
@@ -167,6 +167,27 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   abstract renderContent(): void; // Missing concrete implementation of this method as it is set to be abstract
 }
 
+// Project Item class
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private project: Project;
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, false, project.id);
+    this.project = project;
+
+    this.configure();
+    this.renderContent();
+  }
+
+  configure(): void {}
+
+  renderContent(): void {
+    this.element.querySelector('h2')!.textContent = this.project.title;
+    this.element.querySelector('h3')!.textContent =
+      this.project.people.toString();
+    this.element.querySelector('p')!.textContent = this.project.description;
+  }
+}
+
 // Project List Class
 class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[];
@@ -175,8 +196,6 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     super('project-list', 'app', false, `${type}-projects`); // We can't use this before super finished running
 
     this.assignedProjects = [];
-
-    /* The filter method is a default method which exists on any array in JavaScript. This takes a function which then executes on every item in that projects array and when this function here returns true, we keep the item in a newly created array which is then stored in relevant projects. If this function returns false, we drop the item, not from the original list, but in the new list which is generated and which is stored in relevant projects. */
     this.configure();
     this.renderContent();
   }
@@ -208,9 +227,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     );
     listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
-      const listItem = document.createElement('li');
-      listItem.textContent = prjItem.title;
-      listEl.appendChild(listItem);
+      new ProjectItem(this.element.querySelector('ul')!.id, prjItem);
     }
   }
 }
