@@ -1,4 +1,4 @@
-// Drag & Drop interfaces
+// Drag & Drop Interfaces
 interface Draggable {
   dragStartHandler(event: DragEvent): void;
   dragEndHandler(event: DragEvent): void;
@@ -15,6 +15,7 @@ enum ProjectStatus {
   Active,
   Finished,
 }
+
 class Project {
   constructor(
     public id: string,
@@ -26,7 +27,6 @@ class Project {
 }
 
 // Project State Management
-
 type Listener<T> = (items: T[]) => void;
 
 class State<T> {
@@ -36,6 +36,7 @@ class State<T> {
     this.listeners.push(listenerFn);
   }
 }
+
 class ProjectState extends State<Project> {
   private projects: Project[] = [];
   private static instance: ProjectState;
@@ -52,28 +53,33 @@ class ProjectState extends State<Project> {
     return this.instance;
   }
 
-  generateGUID(): string {
-    const timestamp = new Date().getTime().toString(16);
-    const randomNum = Math.floor(Math.random() * 1000000).toString(16);
-    return `${timestamp}-${randomNum}`;
-  }
-
   addProject(title: string, description: string, numOfPeople: number) {
     const newProject = new Project(
-      this.generateGUID(),
+      Math.random().toString(),
       title,
       description,
       numOfPeople,
-      ProjectStatus.Active // Every project by default is Active
+      ProjectStatus.Active
     );
     this.projects.push(newProject);
+    this.updateListeners();
+  }
+
+  moveProject(projectId: string, newStatus: ProjectStatus) {
+    const project = this.projects.find((prj) => prj.id === projectId);
+    if (project && project.status !== newStatus) {
+      project.status = newStatus;
+      this.updateListeners();
+    }
+  }
+
+  private updateListeners() {
     for (const listenerFn of this.listeners) {
       listenerFn(this.projects.slice());
     }
   }
 }
 
-// Glabal instance of Project State
 const projectState = ProjectState.getInstance();
 
 // Validation
@@ -91,8 +97,6 @@ function validate(validatableInput: Validatable) {
   if (validatableInput.required) {
     isValid = isValid && validatableInput.value.toString().trim().length !== 0;
   }
-  // with != null, this includes both null and undefined
-
   if (
     validatableInput.minLength != null &&
     typeof validatableInput.value === 'string'
@@ -100,7 +104,6 @@ function validate(validatableInput: Validatable) {
     isValid =
       isValid && validatableInput.value.length >= validatableInput.minLength;
   }
-
   if (
     validatableInput.maxLength != null &&
     typeof validatableInput.value === 'string'
@@ -108,36 +111,34 @@ function validate(validatableInput: Validatable) {
     isValid =
       isValid && validatableInput.value.length <= validatableInput.maxLength;
   }
-
   if (
     validatableInput.min != null &&
     typeof validatableInput.value === 'number'
   ) {
     isValid = isValid && validatableInput.value >= validatableInput.min;
   }
-
   if (
     validatableInput.max != null &&
     typeof validatableInput.value === 'number'
   ) {
     isValid = isValid && validatableInput.value <= validatableInput.max;
   }
-
   return isValid;
 }
 
 // autobind decorator
 function autobind(_: any, _2: string, descriptor: PropertyDescriptor) {
   const originalMethod = descriptor.value;
-  const adjustedDescriptor: PropertyDescriptor = {
+  const adjDescriptor: PropertyDescriptor = {
     configurable: true,
     get() {
       const boundFn = originalMethod.bind(this);
       return boundFn;
     },
   };
-  return adjustedDescriptor;
+  return adjDescriptor;
 }
+
 // Component Base Class
 abstract class Component<T extends HTMLElement, U extends HTMLElement> {
   templateElement: HTMLTemplateElement;
@@ -150,10 +151,10 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     insertAtStart: boolean,
     newElementId?: string
   ) {
-    this.templateElement = <HTMLTemplateElement>(
-      document.getElementById(templateId)!
-    );
-    this.hostElement = <T>document.getElementById(hostElementId)!;
+    this.templateElement = document.getElementById(
+      templateId
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(hostElementId)! as T;
 
     const importedNode = document.importNode(
       this.templateElement.content,
@@ -167,20 +168,18 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     this.attach(insertAtStart);
   }
 
-  private attach(insertAtBegininning: boolean) {
+  private attach(insertAtBeginning: boolean) {
     this.hostElement.insertAdjacentElement(
-      insertAtBegininning ? 'afterbegin' : 'beforeend',
+      insertAtBeginning ? 'afterbegin' : 'beforeend',
       this.element
     );
   }
 
   abstract configure(): void;
-
-  abstract renderContent(): void; // Missing concrete implementation of this method as it is set to be abstract
+  abstract renderContent(): void;
 }
 
-// An interface not only can be used to define a custom object type but also as a contract on a class
-// Project Item class
+// ProjectItem Class
 class ProjectItem
   extends Component<HTMLUListElement, HTMLLIElement>
   implements Draggable
@@ -194,6 +193,7 @@ class ProjectItem
       return `${this.project.people} persons`;
     }
   }
+
   constructor(hostId: string, project: Project) {
     super('single-project', hostId, false, project.id);
     this.project = project;
@@ -202,32 +202,29 @@ class ProjectItem
     this.renderContent();
   }
 
-  /*data transfer could actually be null So we have to add an exclamation mark here we of course know that it won't be null here You might wonder why could it be null Well the drag event is always the same kind of event but based on which listener triggers it or which exact event you're listening to, data transfer is not necessarily available So not all drag-related events give you an event object that has the data transfer object. The dragStartHandler which fires up on the dragstart event however, does have it so here we can safely call setData. */
-
   @autobind
-  dragStartHandler(event: DragEvent): void {
-    event.dataTransfer?.setData('text/plain', this.project.id);
+  dragStartHandler(event: DragEvent) {
+    event.dataTransfer!.setData('text/plain', this.project.id);
     event.dataTransfer!.effectAllowed = 'move';
   }
 
-  @autobind
-  dragEndHandler(_: DragEvent): void {
-    console.log('Dragend');
+  dragEndHandler(_: DragEvent) {
+    console.log('DragEnd');
   }
 
-  configure(): void {
+  configure() {
     this.element.addEventListener('dragstart', this.dragStartHandler);
     this.element.addEventListener('dragend', this.dragEndHandler);
   }
 
-  renderContent(): void {
+  renderContent() {
     this.element.querySelector('h2')!.textContent = this.project.title;
-    this.element.querySelector('h3')!.textContent = `${this.persons} assigned.`;
+    this.element.querySelector('h3')!.textContent = this.persons + ' assigned';
     this.element.querySelector('p')!.textContent = this.project.description;
   }
 }
 
-// Project List Class
+// ProjectList Class
 class ProjectList
   extends Component<HTMLDivElement, HTMLElement>
   implements DragTarget
@@ -235,37 +232,42 @@ class ProjectList
   assignedProjects: Project[];
 
   constructor(private type: 'active' | 'finished') {
-    super('project-list', 'app', false, `${type}-projects`); // We can't use this before super finished running
-
+    super('project-list', 'app', false, `${type}-projects`);
     this.assignedProjects = [];
+
     this.configure();
     this.renderContent();
   }
 
   @autobind
-  dragOverHandler(event: DragEvent): void {
-    event.preventDefault();
+  dragOverHandler(event: DragEvent) {
     if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+      event.preventDefault();
       const listEl = this.element.querySelector('ul')!;
       listEl.classList.add('droppable');
     }
   }
 
   @autobind
-  dropHandler(event: DragEvent): void {
-    console.log(event.dataTransfer?.getData('text/plain'));
+  dropHandler(event: DragEvent) {
+    const prjId = event.dataTransfer!.getData('text/plain');
+    projectState.moveProject(
+      prjId,
+      this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished
+    );
   }
 
   @autobind
-  dragLeaveHandler(_: DragEvent): void {
+  dragLeaveHandler(_: DragEvent) {
     const listEl = this.element.querySelector('ul')!;
     listEl.classList.remove('droppable');
   }
 
-  configure(): void {
+  configure() {
     this.element.addEventListener('dragover', this.dragOverHandler);
     this.element.addEventListener('dragleave', this.dragLeaveHandler);
     this.element.addEventListener('drop', this.dropHandler);
+
     projectState.addListener((projects: Project[]) => {
       const relevantProjects = projects.filter((prj) => {
         if (this.type === 'active') {
@@ -281,15 +283,14 @@ class ProjectList
   renderContent() {
     const listId = `${this.type}-projects-list`;
     this.element.querySelector('ul')!.id = listId;
-    this.element.querySelector(
-      'h2'
-    )!.textContent = `${this.type.toUpperCase()} PROJECTS`;
+    this.element.querySelector('h2')!.textContent =
+      this.type.toUpperCase() + ' PROJECTS';
   }
 
   private renderProjects() {
-    const listEl = <HTMLUListElement>(
-      document.getElementById(`${this.type}-projects-list`)!
-    );
+    const listEl = document.getElementById(
+      `${this.type}-projects-list`
+    )! as HTMLUListElement;
     listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       new ProjectItem(this.element.querySelector('ul')!.id, prjItem);
@@ -297,7 +298,7 @@ class ProjectList
   }
 }
 
-// Project Input Class
+// ProjectInput Class
 class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
@@ -305,15 +306,12 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
 
   constructor() {
     super('project-input', 'app', true, 'user-input');
-
     this.titleInputElement = this.element.querySelector(
       '#title'
     ) as HTMLInputElement;
-
     this.descriptionInputElement = this.element.querySelector(
       '#description'
     ) as HTMLInputElement;
-
     this.peopleInputElement = this.element.querySelector(
       '#people'
     ) as HTMLInputElement;
@@ -324,7 +322,7 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     this.element.addEventListener('submit', this.submitHandler);
   }
 
-  renderContent(): void {}
+  renderContent() {}
 
   private gatherUserInput(): [string, string, number] | void {
     const enteredTitle = this.titleInputElement.value;
@@ -335,13 +333,11 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
       value: enteredTitle,
       required: true,
     };
-
     const descriptionValidatable: Validatable = {
       value: enteredDescription,
       required: true,
       minLength: 5,
     };
-
     const peopleValidatable: Validatable = {
       value: +enteredPeople,
       required: true,
@@ -372,13 +368,13 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     event.preventDefault();
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
-      const [title, description, people] = userInput;
-      projectState.addProject(title, description, people);
+      const [title, desc, people] = userInput;
+      projectState.addProject(title, desc, people);
+      this.clearInputs();
     }
-    this.clearInputs();
   }
 }
 
 const prjInput = new ProjectInput();
-const activeProjectList = new ProjectList('active');
-const finishedProjectList = new ProjectList('finished');
+const activePrjList = new ProjectList('active');
+const finishedPrjList = new ProjectList('finished');
